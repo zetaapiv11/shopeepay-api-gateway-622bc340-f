@@ -47,11 +47,19 @@ router.post(
 
     await invoices.expireStale();
 
+    if (config.replacePendingSameAmount && (await invoices.getByOrderId(orderId))) {
+      throw new AppError(409, 'DUPLICATE_ORDER_ID', 'order_id sudah digunakan.');
+    }
+
     const attempts = config.uniqueCodeMax > 0 ? 8 : 1;
     for (let attempt = 0; attempt < attempts; attempt++) {
       const uniqueCode = config.uniqueCodeMax > 0 ? 1 + crypto.randomInt(config.uniqueCodeMax) : 0;
       const payable = amount + uniqueCode;
       const issued = await provider.createInvoice({ amount: payable, orderId });
+
+      if (config.replacePendingSameAmount) {
+        await invoices.expirePendingByPayable(payable);
+      }
 
       let row;
       try {

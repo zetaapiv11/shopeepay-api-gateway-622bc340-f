@@ -14,6 +14,24 @@ async function expireStale() {
   return rowCount;
 }
 
+// Menutup (EXPIRED) invoice PENDING yang nominal bayarnya sama, supaya QRIS baru bisa dibuat.
+async function expirePendingByPayable(payableAmount) {
+  const { rows } = await db.query(
+    `UPDATE invoices SET status = 'EXPIRED', updated_at = now()
+      WHERE status = 'PENDING' AND payable_amount = $1
+      RETURNING id`,
+    [payableAmount]
+  );
+  for (const r of rows) {
+    await db.query(
+      `INSERT INTO payment_events (invoice_id, event_type, from_status, to_status, amount, source, details)
+       VALUES ($1,'REPLACED','PENDING','EXPIRED',$2,'create-qris',$3)`,
+      [r.id, payableAmount, JSON.stringify({ reason: 'digantikan QRIS baru dengan nominal sama' })]
+    );
+  }
+  return rows.length;
+}
+
 async function insert(row) {
   const { rows } = await db.query(
     `INSERT INTO invoices
@@ -192,4 +210,4 @@ function serialize(row, { includePayload = false, qrisUrl = null } = {}) {
   return out;
 }
 
-module.exports = { expireStale, insert, getByOrderId, getById, markPaid, listPending, list, serialize };
+module.exports = { expireStale, expirePendingByPayable, insert, getByOrderId, getById, markPaid, listPending, list, serialize };

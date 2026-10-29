@@ -59,14 +59,19 @@ const http = axios.create({
 
 const toEpochSeconds = (d) => Math.floor(d.getTime() / 1000);
 
-function buildListPayload(token, { page, limit, startDate, endDate }) {
+// Format request ini cocok dengan hasil capture DevTools akun merchant (get-transaction-list).
+function buildListPayload(token, { limit, startDate, endDate }) {
   return {
     data: {
-      metadata: { token },
-      page,
-      page_size: limit,
-      start_time: toEpochSeconds(startDate),
-      end_time: toEpochSeconds(endDate),
+      metadata: { token, language: 'id', timezone: 'Asia/Jakarta' },
+      pageSize: limit,
+      filter: {
+        startTime: toEpochSeconds(startDate),
+        endTime: toEpochSeconds(endDate),
+        serviceList: [1, 3],
+      },
+      sorter: { field: 'createTime', order: 'descend' },
+      next_position: '',
     },
   };
 }

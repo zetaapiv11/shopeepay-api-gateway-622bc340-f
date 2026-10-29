@@ -54,6 +54,8 @@ const config = {
   callbackMaxAttempts: Math.max(1, int(env.CALLBACK_MAX_ATTEMPTS, 10)),
 
   autoMigrate: bool(env.AUTO_MIGRATE, false),
+  // Bila true: invoice PENDING dengan nominal sama otomatis di-EXPIRED saat membuat QRIS baru (untuk testing).
+  replacePendingSameAmount: bool(env.REPLACE_PENDING_SAME_AMOUNT, false),
   logLevel: (env.LOG_LEVEL || 'info').toLowerCase(),
 };
 

@@ -2,16 +2,11 @@
 # Catatan paket: kebijakan paket gratis Render (tidur saat idle, masa berlaku database gratis, dll.)
 # dapat berubah. Cek halaman pricing Render lalu sesuaikan nilai `plan` di bawah.
 
-databases:
-  - name: shopeepay-ddb
-    databaseName: shopeepay
-    plan: basic-1gb
-
 services:
   - type: web
-    name: shopeepay-apii-gateway
+    name: shopeepay-api-gateway
     runtime: node
-    plan: starter
+    plan: starter # selalu aktif 24 jam (tidak tidur)
     buildCommand: npm install --omit=dev
     startCommand: npm start
     healthCheckPath: /api/health
@@ -21,11 +16,9 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: AUTO_MIGRATE
-        value: "true"
+        value: "true" # migrasi dijalankan saat start; set "false" bila memakai pre-deploy command
       - key: DATABASE_URL
-        fromDatabase:
-          name: shopeepay-ddb
-          property: connectionString
+        sync: false # tempel Internal Database URL dari database Render yang kamu buat
       - key: API_KEY
         sync: false
       - key: SHOPEE_TOKEN
