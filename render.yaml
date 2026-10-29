@@ -1,0 +1,46 @@
+# Render Blueprint. Secret TIDAK disimpan di sini: isi lewat Dashboard Render (sync: false).
+# Catatan paket: kebijakan paket gratis Render (tidur saat idle, masa berlaku database gratis, dll.)
+# dapat berubah. Cek halaman pricing Render lalu sesuaikan nilai `plan` di bawah.
+
+databases:
+  - name: shopeepay-db
+    databaseName: shopeepay
+    plan: free # ganti ke paket berbayar untuk data produksi yang harus persisten jangka panjang
+
+services:
+  - type: web
+    name: shopeepay-api-gateway
+    runtime: node
+    plan: free # ganti sesuai kebutuhan (paket gratis bisa tidur saat idle)
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      - key: AUTO_MIGRATE
+        value: "true" # migrasi dijalankan saat start; set "false" bila memakai pre-deploy command
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shopeepay-db
+          property: connectionString
+      - key: API_KEY
+        sync: false
+      - key: SHOPEE_TOKEN
+        sync: false
+      - key: SHOPEE_API_BASE
+        sync: false
+      - key: QRIS_STATIC
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: CALLBACK_URL
+        sync: false
+      - key: CALLBACK_SECRET
+        sync: false
