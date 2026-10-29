@@ -3,15 +3,15 @@
 # dapat berubah. Cek halaman pricing Render lalu sesuaikan nilai `plan` di bawah.
 
 databases:
-  - name: shopeepay-db
+  - name: shopeepay-ddb
     databaseName: shopeepay
-    plan: free # ganti ke paket berbayar untuk data produksi yang harus persisten jangka panjang
+    plan: basic-1gb # ganti ke paket berbayar untuk data produksi yang harus persisten jangka panjang
 
 services:
   - type: web
-    name: shopeepay-api-gateway
+    name: shopeepay-apii-gateway
     runtime: node
-    plan: free # ganti sesuai kebutuhan (paket gratis bisa tidur saat idle)
+    plan: starter # ganti sesuai kebutuhan (paket gratis bisa tidur saat idle)
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /api/health
